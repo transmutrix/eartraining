@@ -1,0 +1,23 @@
+html {
+  background-color: #404080;
+  color: white;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 2rem;
+}
+
+#error {
+  color: pink;
+  font-size: 120%;
+  padding: 20px;
+}
+
+#message {
+  font-size: 80%;
+  padding: 20px;
+}
+
+#fps-display {
+  font-size: 60%;
+  position: absolute;
+  bottom: 0.25rem;
+}
