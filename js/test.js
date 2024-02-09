@@ -32,7 +32,7 @@ if (!midiSupported)  setError("This browser doesn't support WebMIDI!");
 function onNoteOn(note, velocity) {
   setLabel("message", "Note on: " + note);
   queueNoteOn(note, velocity);
-  synthNoteOn(note);
+  synthNoteOn(note, velocity);
 }
 
 function onNoteOff(note) {
@@ -58,13 +58,6 @@ function getMIDIMessage(midiMessage) {
   let command = midiMessage.data[0];
   let note = midiMessage.data[1];
   let velocity = midiMessage.data[2];
-
-  // 139, 52, 67
-
-  // let isNoteOn = !!(command & 0b10010000 === 0b10010000);
-  // let isNoteOff = !isNoteOn && !!(command & 0b10000000 === 0b10000000);
-  // console.log("is off: ", isNoteOff);
-  // console.log("is on: ", isNoteOn);
 
   if (command === 0b10000000) { // = 80= 128	Chan 1 Note off	Note Number (0-127)	Note Velocity (0-127)
     onNoteOff(note);
@@ -175,6 +168,7 @@ function onMIDISuccess(midiAccess) {
 
     for(const input of midiAccess.inputs.values()) {
       input.onmidimessage = getMIDIMessage;
+      // console.log(input);
     }
 
     // for (const output of midiAccess.outputs.values()) {
