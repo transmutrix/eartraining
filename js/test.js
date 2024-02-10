@@ -1,5 +1,6 @@
 import { audioCtx, synthNoteOn, synthNoteOff, noteTable } from "./synth.js";
 
+const gLogging = false;
 const BaseScore = 10;
 const MinScore = 1;
 
@@ -131,7 +132,7 @@ function onNoteOff(note) {
 }
 
 function getMIDIMessage(midiMessage) {
-  console.log(midiMessage);
+  if (gLogging)  console.log(midiMessage);
 
   // Note: reference - https://www.midi.org/specifications-old/item/table-2-expanded-messages-list-status-bytes
 
@@ -248,7 +249,7 @@ function getMIDIMessage(midiMessage) {
 }
 
 function onMIDISuccess(midiAccess) {
-    console.log(midiAccess);
+  if (gLogging)  console.log(midiAccess);
     // midiInputs = midiAccess.inputs;
     // cpmst outputs = midiAccess.outputs;
     gMidiAccess = midiAccess;
@@ -260,7 +261,7 @@ function onMIDISuccess(midiAccess) {
     }
 
     // for (const output of midiAccess.outputs.values()) {
-    //   console.log("output:", output);
+    //   if (gLogging)  console.log("output:", output);
     // }
 
     if (midiAccess.inputs.size === 0) {
@@ -300,7 +301,7 @@ function chooseNote() {
   const range = gHighestNoteIndex - gLowestNoteIndex;
   gNoteIndex = gLowestNoteIndex + Math.floor(Math.random() * range);
   gNote = noteTable[gNoteIndex];
-  // console.log(gNoteIndex, gNote);
+  // if (gLogging)  console.log(gNoteIndex, gNote);
 
   gGameState = GameState.PlayNote;
   gMaxScore += BaseScore;
