@@ -1,4 +1,4 @@
-import { synthNoteOn, synthNoteOff } from "./synth.js";
+import { audioCtx, synthNoteOn, synthNoteOff, noteTable } from "./synth.js";
 
 const GameState = Object.freeze({
   Init: Symbol("Init"),
@@ -9,10 +9,10 @@ const GameState = Object.freeze({
 
 let gMidiAccess = null;
 let gGameState = GameState.Init;
-let gCommands = [];
+// let gCommands = [];
 
-const queueNoteOn = (note, velocity) => gCommands.push({kind: 'note-on', note: note, velocity: velocity});
-const queueNoteOff = (note) => gCommands.push({kind: 'note-off', note: note, velocity: 0});
+// const queueNoteOn = (note, velocity) => gCommands.push({kind: 'note-on', note: note, velocity: velocity});
+// const queueNoteOff = (note) => gCommands.push({kind: 'note-off', note: note, velocity: 0});
 
 function setLabel(id, text) {
   const el = document.getElementById(id);
@@ -30,14 +30,32 @@ const midiSupported = navigator.requestMIDIAccess;
 if (!midiSupported)  setError("This browser doesn't support WebMIDI!");
 
 function onNoteOn(note, velocity) {
-  setLabel("message", "Note on: " + note);
-  queueNoteOn(note, velocity);
+  // setLabel("message", "Note on: " + note);
+  // queueNoteOn(note, velocity);
   synthNoteOn(note, velocity);
+  // TODO: guess!
+  switch (gGameState) {
+    case GameState.PlayNote:
+    case GameState.Guessed:
+    {
+      // XXX
+      gGuessed = null;
+      for (const check of noteTable) {
+        if (check.index === note) {
+          gGuessed = check;
+          break;
+        }
+      }
+      if (gGuessed) {
+        note2Display.textContent = `${gGuessed.name}${gGuessed.octave}`;
+      }
+    } break;
+  }
 }
 
 function onNoteOff(note) {
-  setLabel("message", "Note off: " + note);
-  queueNoteOff(note);
+  // setLabel("message", "Note off: " + note);
+  // queueNoteOff(note);
   synthNoteOff(note);
 }
 
@@ -183,20 +201,72 @@ function onMIDIFailure() {
 setLabel("message", "Finding MIDI devices...");
 await navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
 
+let gNoteIndex = 0;
+let gNote = null;
+let gNoteStarted = 0;
+let gGuessed = null;
+let gGameStartTime = 0;
+
+setLabel("message", "Click to play.");
+// document.body.addEventListener('click', (element, event) => {
+//   if (audioCtx.state === 'paused') {
+//     audioCtx.resume();
+//   }
+//   setLabel("message", "Replicate the pitch! (Click to replay)");
+// }, true);
+
+const btnPlay = document.getElementById("btn-play");
+const note1Display = document.getElementById("note1");
+const note2Display = document.getElementById("note2");
+const gameClock = document.getElementById("game-clock");
+
+btnPlay.onclick = (el, ev) => {
+  if (audioCtx.state === "paused") {
+    audioCtx.resume();
+  }
+  if (!gGameStartTime) {
+    gGameStartTime = Date.now();
+  }
+  if (!gNote) {
+    gNoteIndex = Math.floor(Math.random() * noteTable.length);
+    gNote = noteTable[gNoteIndex];
+    console.log(gNoteIndex, gNote);
+    gGameState = GameState.PlayNote;
+    note1Display.textContent = `${gNote.name}${gNote.octave}`;
+    note2Display.textContent = "?";
+    setLabel("message", "Replicate the note!");
+  }
+  if (!gNoteStarted) {
+    gNoteStarted = performance.now();
+    synthNoteOn(gNote.index, 127*0.75);
+    // btnPlay.classList.add("progress");
+  }
+};
+
 function updateGame(dt) {
-  // TODO
+  const now = performance.now();
   switch (gGameState) {
     case GameState.Init: {
-      // TODO: Choose a note.
+      // Choose a note.
+      // gNoteIndex = Math.floor(Math.random() * noteTable.length);
+      // gNote = noteTable[gNoteIndex];
+      // gNoteStarted = now;
+      // synthNoteOn(gNote.index, 127);
+      // gGameState = GameState.PlayNote;
     } break;
     case GameState.PlayNote: {
       // TODO: Go to guess mode.
+      if (gNoteStarted && now - gNoteStarted >= 1000.0) {
+        gNoteStarted = 0;
+        synthNoteOff(gNote.index);
+        // btnPlay.classList.remove("progress");
+      }
     } break;
     case GameState.Guessed: {
       // TODO: Compare, set values.
     } break;
   }
-  gCommands.length = 0;
+  // gCommands.length = 0;
 }
 
 let lastLoop = 0
@@ -212,6 +282,24 @@ function loop(timestamp) {
     lastSecond = seconds;
     setLabel("fps-display", `FPS: ${lastSecondFrames}`);
     lastSecondFrames = 0;
+  }
+
+  // game clock
+  if (gGameStartTime !== 0) {
+    const since = Date.now() - gGameStartTime;
+    // let ms = Math.floor(since % 1000).toString();
+    let seconds = Math.floor((since/1000) % 60).toString();
+    let minutes = Math.floor((since/1000/60) % 60).toString();
+    let hours = Math.floor(since/1000/60/60).toString();
+    // while (ms.length < 3)  ms = '0' + ms;
+    while (seconds.length < 2) seconds = '0' + seconds;
+    while (minutes.length < 2) minutes = '0' + minutes;
+    while (hours.length < 2) hours = '0' + hours;
+    if (hours !== "00") {
+      gameClock.textContent = `${hours}:${minutes}:${seconds}`;
+    } else {
+      gameClock.textContent = `${minutes}:${seconds}`;
+    }
   }
 
   lastLoop = timestamp;
