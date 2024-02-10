@@ -110,12 +110,14 @@ function onNoteOn(note, velocity) {
           gNote = null;
           gGameState = GameState.Init;
           gQueueNext = Date.now() + 2000;
+          setLabel("possible-points", "");
         } else {
           if (gNote.name === gGuessed.name) {
             gPoints = Math.max(MinScore, gPoints - 1);
           } else {
             gPoints = Math.max(MinScore, gPoints - 2);
           }
+          setLabel("possible-points", `Possible points: ${gPoints.toFixed(0)}`);
         }
       }
     } break;
@@ -305,6 +307,7 @@ function chooseNote() {
   note1Display.textContent = `${gNote.name}${gNote.octave}`;
   note2Display.textContent = "?";
   setLabel("message", "Replicate the note!<br>Click the button or press Space ␣ to play it again.");
+  setLabel("possible-points", `Possible points: ${gPoints.toFixed(0)}`);
 }
 
 function playNote() {
