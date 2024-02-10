@@ -257,12 +257,15 @@ function onMIDISuccess(midiAccess) {
 
     for(const input of midiAccess.inputs.values()) {
       input.onmidimessage = getMIDIMessage;
-      // console.log(input);
     }
 
     // for (const output of midiAccess.outputs.values()) {
     //   console.log("output:", output);
     // }
+
+    if (midiAccess.inputs.size === 0) {
+      setError("No MIDI input devices detected!<br>Please connect a MIDI device and refresh the page.");
+    }
 }
 
 function onMIDIFailure() {
@@ -338,12 +341,6 @@ function updateGame(dt) {
         gQueueNext = 0;
         btnPlay.click();
       }
-      // Choose a note.
-      // gNoteIndex = Math.floor(Math.random() * noteTable.length);
-      // gNote = noteTable[gNoteIndex];
-      // gNoteStarted = now;
-      // synthNoteOn(gNote.index, 127);
-      // gGameState = GameState.PlayNote;
     } break;
     case GameState.PlayNote: {
       if (gNoteStarted && now - gNoteStarted >= 1000.0) {
@@ -412,5 +409,3 @@ function loop(timestamp) {
   window.requestAnimationFrame(loop);
 }
 window.requestAnimationFrame(loop);
-
-
