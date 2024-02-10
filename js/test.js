@@ -73,6 +73,7 @@ function onNoteOn(note, velocity) {
           gScore += gPoints;
           if (gPoints === BaseScore) {
             gPerfects += 1;
+            createFXPerfect();
           }
           gNote = null;
           gGameState = GameState.Init;
@@ -289,8 +290,6 @@ document.body.onkeydown = function(e){
   if (e.keyCode == 32) { // Space bar
     btnPlay.click();
     e.preventDefault();
-    // XXX
-    createFXPerfect();
   }
 }
 
