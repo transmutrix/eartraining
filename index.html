@@ -7,29 +7,35 @@
 </head>
 <body>
 
-  <div id="game-name"></div>
-  <div id="message"></div>
-  <div id="error"></div>
-  <div id="fps-display"></div>
+  <div id="game-name" class="tshadow"></div>
+  <div id="message" class="tshadow"></div>
+  <div id="error" class="tshadow"></div>
+  <div id="fps-display" class="tshadow"></div>
 
-  <div id="game-stats">
+  <div id="game-stats" class="tshadow">
     <div id="game-clock">00:00</div>
     <div id="game-score">0/0</div>
+    <div id="game-perfects"></div>
   </div>
-
-  <div id="note"></div>
-  <div id="guess"></div>
 
   <div id="note-container">
-    <div class="note-display">
-      <div id="note1" class="note-display-name"></div>
-    </div>
-    <div class="note-display">
-      <div id="note2" class="note-display-name"></div>
-    </div>
+    <!-- <div class="center"> -->
+      <div class="note-display">
+        <div id="note1" class="note-display-name"></div>
+      </div>
+      <div class="note-display">
+        <div id="note2" class="note-display-name"></div>
+      </div>
+    <!-- </div> -->
   </div>
 
-  <div id="btn-play" class="button" class="progress">PLAY NOTE</div>
+  <!-- <div class="center"> -->
+    <div id="btn-play" class="button">PLAY NOTE</div>
+  <!-- </div> -->
+
+  <div id="fx">
+    <!-- <div class="perfect">PERFECT!</div> -->
+  </div>
 
   <script type="module" src="js/test.js"></script>
   <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> -->

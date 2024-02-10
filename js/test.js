@@ -14,21 +14,36 @@ let gGameState = GameState.Init;
 let gScore = 0;
 let gPoints = 0;
 let gMaxScore = 0;
+let gPerfects = 0;
 // let gGuesses = 0;
 // let gUsedHint = false;
 // let gCommands = [];
+
+let gLowestNoteIndex = 0;
+let gHighestNoteIndex = noteTable.length - 1;
 
 // const queueNoteOn = (note, velocity) => gCommands.push({kind: 'note-on', note: note, velocity: velocity});
 // const queueNoteOff = (note) => gCommands.push({kind: 'note-off', note: note, velocity: 0});
 
 function setLabel(id, text) {
   const el = document.getElementById(id);
-  if (el)  el.textContent = text;
+  if (el)  el.innerHTML = text;
 }
 
 function setError(text) {
   setLabel("error", text);
   throw new Error(text);
+}
+
+const gEffectContainer = document.getElementById("fx");
+const gEffects = [];
+
+function createFXPerfect() {
+  const el = document.createElement("div");
+  el.innerText = "✨ PERFECT! ✨";
+  el.classList.add("perfect");
+  gEffectContainer.appendChild(el);
+  gEffects.push({ time: Date.now(), lifetime: 2, el: el });
 }
 
 setLabel("game-name", "Note Match");
@@ -56,6 +71,9 @@ function onNoteOn(note, velocity) {
         // TODO: Check correctness!
         if (gNote === gGuessed) {
           gScore += gPoints;
+          if (gPoints === BaseScore) {
+            gPerfects += 1;
+          }
           gNote = null;
           gGameState = GameState.Init;
         } else {
@@ -237,6 +255,7 @@ const note1Display = document.getElementById("note1");
 const note2Display = document.getElementById("note2");
 const gameClock = document.getElementById("game-clock");
 const gameScore = document.getElementById("game-score");
+const gamePerfects = document.getElementById("game-perfects");
 
 function chooseNote() {
   gNoteIndex = Math.floor(Math.random() * noteTable.length);
@@ -250,7 +269,7 @@ function chooseNote() {
 
   note1Display.textContent = `${gNote.name}${gNote.octave}`;
   note2Display.textContent = "?";
-  setLabel("message", "Replicate the note!");
+  setLabel("message", "Replicate the note!<br>Click the button or press Space to play it again.");
 }
 
 function playNote() {
@@ -265,6 +284,15 @@ btnPlay.onclick = (el, ev) => {
   if (!gNote)                       chooseNote();
   if (!gNoteStarted)                playNote();
 };
+
+document.body.onkeydown = function(e){
+  if (e.keyCode == 32) { // Space bar
+    btnPlay.click();
+    e.preventDefault();
+    // XXX
+    createFXPerfect();
+  }
+}
 
 function updateGame(dt) {
   const now = performance.now();
@@ -328,6 +356,18 @@ function loop(timestamp) {
   // game score
   if (gMaxScore !== 0) {
     gameScore.textContent = `${gScore}/${gMaxScore} (${(gScore/gMaxScore * 100).toFixed(0)}%)`;
+  }
+  if (gPerfects !== 0) {
+    gamePerfects.textContent = `⭐️ ${gPerfects.toFixed(0)}`;
+  }
+
+  // effects
+  const now = Date.now();
+  for (let i = gEffects.length-1; i >= 0; --i) {
+    if (now - gEffects[i].time >= gEffects[i].lifetime * 1000.0) {
+      gEffects[i].el.remove();
+      gEffects.splice(i);
+    }
   }
 
   lastLoop = timestamp;
