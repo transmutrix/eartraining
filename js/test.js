@@ -19,8 +19,10 @@ let gPerfects = 0;
 // let gUsedHint = false;
 // let gCommands = [];
 
-let gLowestNoteIndex = 0;
-let gHighestNoteIndex = noteTable.length - 1;
+let gLowestNoteIndex = 27; // 0
+let gHighestNoteIndex = 75; // noteTable.length - 1;
+
+let gQueueNext = 0;
 
 // const queueNoteOn = (note, velocity) => gCommands.push({kind: 'note-on', note: note, velocity: velocity});
 // const queueNoteOff = (note) => gCommands.push({kind: 'note-off', note: note, velocity: 0});
@@ -41,6 +43,30 @@ const gEffects = [];
 function createFXPerfect() {
   const el = document.createElement("div");
   el.innerText = "✨ PERFECT! ✨";
+  el.classList.add("perfect");
+  gEffectContainer.appendChild(el);
+  gEffects.push({ time: Date.now(), lifetime: 2, el: el });
+}
+
+function createFXNice() {
+  const el = document.createElement("div");
+  el.innerText = "Nice! 👍";
+  el.classList.add("perfect");
+  gEffectContainer.appendChild(el);
+  gEffects.push({ time: Date.now(), lifetime: 2, el: el });
+}
+
+function createFXOk() {
+  const el = document.createElement("div");
+  el.innerText = "Ok! 😅";
+  el.classList.add("perfect");
+  gEffectContainer.appendChild(el);
+  gEffects.push({ time: Date.now(), lifetime: 2, el: el });
+}
+
+function createFXBogey() {
+  const el = document.createElement("div");
+  el.innerText = "😬😬😬";
   el.classList.add("perfect");
   gEffectContainer.appendChild(el);
   gEffects.push({ time: Date.now(), lifetime: 2, el: el });
@@ -74,9 +100,16 @@ function onNoteOn(note, velocity) {
           if (gPoints === BaseScore) {
             gPerfects += 1;
             createFXPerfect();
+          } else if (gPoints >= Math.floor(BaseScore * 0.75)) {
+            createFXNice();
+          } else if (gPoints >= Math.floor(BaseScore * 0.45)) {
+            createFXOk();
+          } else {
+            createFXBogey();
           }
           gNote = null;
           gGameState = GameState.Init;
+          gQueueNext = Date.now() + 2000;
         } else {
           if (gNote.name === gGuessed.name) {
             gPoints = Math.max(MinScore, gPoints - 1);
@@ -259,7 +292,8 @@ const gameScore = document.getElementById("game-score");
 const gamePerfects = document.getElementById("game-perfects");
 
 function chooseNote() {
-  gNoteIndex = Math.floor(Math.random() * noteTable.length);
+  const range = gHighestNoteIndex - gLowestNoteIndex;
+  gNoteIndex = gLowestNoteIndex + Math.floor(Math.random() * range);
   gNote = noteTable[gNoteIndex];
   // console.log(gNoteIndex, gNote);
 
@@ -270,7 +304,7 @@ function chooseNote() {
 
   note1Display.textContent = `${gNote.name}${gNote.octave}`;
   note2Display.textContent = "?";
-  setLabel("message", "Replicate the note!<br>Click the button or press Space to play it again.");
+  setLabel("message", "Replicate the note!<br>Click the button or press Space ␣ to play it again.");
 }
 
 function playNote() {
@@ -297,6 +331,10 @@ function updateGame(dt) {
   const now = performance.now();
   switch (gGameState) {
     case GameState.Init: {
+      if (gQueueNext && Date.now() > gQueueNext) {
+        gQueueNext = 0;
+        btnPlay.click();
+      }
       // Choose a note.
       // gNoteIndex = Math.floor(Math.random() * noteTable.length);
       // gNote = noteTable[gNoteIndex];
@@ -305,7 +343,6 @@ function updateGame(dt) {
       // gGameState = GameState.PlayNote;
     } break;
     case GameState.PlayNote: {
-      // TODO: Go to guess mode.
       if (gNoteStarted && now - gNoteStarted >= 1000.0) {
         gNoteStarted = 0;
         synthNoteOff(gNote.index);
@@ -313,7 +350,6 @@ function updateGame(dt) {
       }
     } break;
     case GameState.Guessed: {
-      // TODO: Compare, set values.
     } break;
   }
   // gCommands.length = 0;
