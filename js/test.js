@@ -1,14 +1,21 @@
 import { audioCtx, synthNoteOn, synthNoteOff, noteTable } from "./synth.js";
 
+const BaseScore = 10;
+const MinScore = 1;
+
 const GameState = Object.freeze({
   Init: Symbol("Init"),
   PlayNote: Symbol("PlayNote"),
   Guessed: Symbol("Guessed"),
 });
 
-
 let gMidiAccess = null;
 let gGameState = GameState.Init;
+let gScore = 0;
+let gPoints = 0;
+let gMaxScore = 0;
+// let gGuesses = 0;
+// let gUsedHint = false;
 // let gCommands = [];
 
 // const queueNoteOn = (note, velocity) => gCommands.push({kind: 'note-on', note: note, velocity: velocity});
@@ -33,12 +40,10 @@ function onNoteOn(note, velocity) {
   // setLabel("message", "Note on: " + note);
   // queueNoteOn(note, velocity);
   synthNoteOn(note, velocity);
-  // TODO: guess!
   switch (gGameState) {
     case GameState.PlayNote:
     case GameState.Guessed:
     {
-      // XXX
       gGuessed = null;
       for (const check of noteTable) {
         if (check.index === note) {
@@ -48,6 +53,18 @@ function onNoteOn(note, velocity) {
       }
       if (gGuessed) {
         note2Display.textContent = `${gGuessed.name}${gGuessed.octave}`;
+        // TODO: Check correctness!
+        if (gNote === gGuessed) {
+          gScore += gPoints;
+          gNote = null;
+          gGameState = GameState.Init;
+        } else {
+          if (gNote.name === gGuessed.name) {
+            gPoints = Math.max(MinScore, gPoints - 1);
+          } else {
+            gPoints = Math.max(MinScore, gPoints - 2);
+          }
+        }
       }
     } break;
   }
@@ -219,28 +236,34 @@ const btnPlay = document.getElementById("btn-play");
 const note1Display = document.getElementById("note1");
 const note2Display = document.getElementById("note2");
 const gameClock = document.getElementById("game-clock");
+const gameScore = document.getElementById("game-score");
+
+function chooseNote() {
+  gNoteIndex = Math.floor(Math.random() * noteTable.length);
+  gNote = noteTable[gNoteIndex];
+  // console.log(gNoteIndex, gNote);
+
+  gGameState = GameState.PlayNote;
+  gMaxScore += BaseScore;
+  gPoints = BaseScore;
+  // gGuesses = 0;
+
+  note1Display.textContent = `${gNote.name}${gNote.octave}`;
+  note2Display.textContent = "?";
+  setLabel("message", "Replicate the note!");
+}
+
+function playNote() {
+  gNoteStarted = performance.now();
+  synthNoteOn(gNote.index, 127*0.75);
+  // btnPlay.classList.add("progress");
+}
 
 btnPlay.onclick = (el, ev) => {
-  if (audioCtx.state === "paused") {
-    audioCtx.resume();
-  }
-  if (!gGameStartTime) {
-    gGameStartTime = Date.now();
-  }
-  if (!gNote) {
-    gNoteIndex = Math.floor(Math.random() * noteTable.length);
-    gNote = noteTable[gNoteIndex];
-    console.log(gNoteIndex, gNote);
-    gGameState = GameState.PlayNote;
-    note1Display.textContent = `${gNote.name}${gNote.octave}`;
-    note2Display.textContent = "?";
-    setLabel("message", "Replicate the note!");
-  }
-  if (!gNoteStarted) {
-    gNoteStarted = performance.now();
-    synthNoteOn(gNote.index, 127*0.75);
-    // btnPlay.classList.add("progress");
-  }
+  if (audioCtx.state === "paused")  audioCtx.resume();
+  if (!gGameStartTime)              gGameStartTime = Date.now();
+  if (!gNote)                       chooseNote();
+  if (!gNoteStarted)                playNote();
 };
 
 function updateGame(dt) {
@@ -300,6 +323,11 @@ function loop(timestamp) {
     } else {
       gameClock.textContent = `${minutes}:${seconds}`;
     }
+  }
+
+  // game score
+  if (gMaxScore !== 0) {
+    gameScore.textContent = `${gScore}/${gMaxScore} (${(gScore/gMaxScore * 100).toFixed(0)}%)`;
   }
 
   lastLoop = timestamp;

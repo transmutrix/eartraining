@@ -30,12 +30,18 @@ body {
   right: 0.25rem;
 }
 
-#game-clock {
+#game-stats {
   font-size: 100%;
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+  text-align: right;
 }
+
+/* #game-clock {
+}
+#game-score {
+} */
 
 #game-name {
   text-decoration: underline;
