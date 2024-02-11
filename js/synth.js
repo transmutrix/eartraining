@@ -2,6 +2,7 @@
 export const audioCtx = new(window.AudioContext || window.webkitAudioContext);
 const gainNode = audioCtx.createGain();
 const notemap = new Map();
+const gameNoteMap = new Map();
 gainNode.connect(audioCtx.destination);
 gainNode.gain.value = 0.22;
 
@@ -100,3 +101,15 @@ export function synthNoteOff(note) {
 //   key.addEventListener('pointerup', event => { noteoff(event.target) })
 //   key.addEventListener('pointerleave', event => { noteoff(event.target) })
 // })
+
+export function synthGameNoteOn(note, velocity = 127) {
+  synthGameNoteOff(note);
+  gameNoteMap.set(note, createOscillator(getHz(note-60+3), velocity/127));
+  gameNoteMap.get(note).start(0)
+}
+
+export function synthGameNoteOff(note) {
+  const oscNode = gameNoteMap.get(note);
+  if (oscNode)  oscNode.stop();
+  gameNoteMap.delete(note);
+}

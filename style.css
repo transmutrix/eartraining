@@ -10,7 +10,6 @@ html {
 #error {
   color: pink;
   font-size: 120%;
-  padding: 20px;
 }
 
 #message {

@@ -1,5 +1,5 @@
 import {
-  audioCtx, synthNoteOn, synthNoteOff,
+  audioCtx, synthNoteOn, synthNoteOff, synthGameNoteOn, synthGameNoteOff,
   noteTable61, noteTable49, noteTable32, noteTable25,
   sharpsToFlats
 } from "./synth.js";
@@ -284,7 +284,7 @@ let gNoteStarted = 0;
 let gGuessed = null;
 let gGameStartTime = 0;
 
-setLabel("message", "Click to play.");
+setLabel("message", "Click 'PLAY NOTE' or press Space ␣ to start.");
 // document.body.addEventListener('click', (element, event) => {
 //   if (audioCtx.state === 'paused') {
 //     audioCtx.resume();
@@ -359,7 +359,8 @@ btnRange25.onclick = (el, ev) => {
   if (gRange !== 25) {
     gRange = 25;
     gNoteTable = noteTable25;
-    // TODO: choose new note!
+    chooseNote();
+    playNote();
   }
   btnRange25.classList.remove("list-button");
   btnRange25.classList.add("list-button-selected");
@@ -375,7 +376,8 @@ btnRange32.onclick = (el, ev) => {
   if (gRange !== 32) {
     gRange = 32;
     gNoteTable = noteTable32;
-    // TODO: choose new note!
+    chooseNote();
+    playNote();
   }
   btnRange32.classList.remove("list-button");
   btnRange32.classList.add("list-button-selected");
@@ -391,7 +393,8 @@ btnRange49.onclick = (el, ev) => {
   if (gRange !== 49) {
     gRange = 49;
     gNoteTable = noteTable49;
-    // TODO: choose new note!
+    chooseNote();
+    playNote();
   }
   btnRange49.classList.remove("list-button");
   btnRange49.classList.add("list-button-selected");
@@ -407,7 +410,8 @@ btnRange61.onclick = (el, ev) => {
   if (gRange !== 61) {
     gRange = 61;
     gNoteTable = noteTable61;
-    // TODO: choose new note!
+    chooseNote();
+    playNote();
   }
   btnRange61.classList.remove("list-button");
   btnRange61.classList.add("list-button-selected");
@@ -437,6 +441,8 @@ function showNotes() {
 }
 
 function chooseNote() {
+  if (gNote)  synthGameNoteOff(gNote.index);
+
   gNoteIndex = Math.floor(Math.random() * gNoteTable.length);
   gNote = gNoteTable[gNoteIndex];
   // if (gLogging)  console.log(gNoteIndex, gNote);
@@ -451,12 +457,15 @@ function chooseNote() {
   setLabel("possible-points", `Possible points: ${gPoints.toFixed(0)}`);
 }
 
+let gPlayingNotes = [];
+
 function playNote() {
   if (!gNote || gMode === GameMode.ShowOnly) {
     return;
   }
   gNoteStarted = performance.now();
-  synthNoteOn(gNote.index, 127*0.75);
+  synthGameNoteOn(gNote.index, 127*0.75);
+  gPlayingNotes.push({ index: gNote.index, time: Date.now() });
   // btnPlay.classList.add("progress");
 }
 
@@ -486,14 +495,21 @@ function updateGame(dt) {
     case GameState.PlayNote: {
       if (gNoteStarted && now - gNoteStarted >= 1000.0) {
         gNoteStarted = 0;
-        synthNoteOff(gNote.index);
+        synthGameNoteOff(gNote.index);
         // btnPlay.classList.remove("progress");
       }
     } break;
     case GameState.Guessed: {
     } break;
   }
-  // gCommands.length = 0;
+
+  const date = Date.now();
+  for (let i = gPlayingNotes.length-1; i >= 0; --i) {
+    if (date >= gPlayingNotes[i].time + 2000) {
+      synthGameNoteOff(gPlayingNotes[i].index);
+      gPlayingNotes.splice(i);
+    }
+  }
 }
 
 let lastLoop = 0
