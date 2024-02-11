@@ -201,7 +201,6 @@ function onMIDISuccess(midiAccess) {
     // midiInputs = midiAccess.inputs;
     // cpmst outputs = midiAccess.outputs;
     gMidiAccess = midiAccess;
-    // debugger;
     setLabel("message", "Done.");
 
     for(const input of midiAccess.inputs.values()) {
@@ -245,10 +244,35 @@ const btnModeShowAndPlay = document.getElementById("btn-mode1");
 const btnModePlayOnly = document.getElementById("btn-mode2");
 const btnModeShowOnly = document.getElementById("btn-mode3");
 
+const modeButtons = [
+  btnModeShowAndPlay,
+  btnModePlayOnly,
+  btnModeShowOnly,
+];
+
 const btnRange25 = document.getElementById("btn-25");
 const btnRange32 = document.getElementById("btn-32");
 const btnRange49 = document.getElementById("btn-49");
 const btnRange61 = document.getElementById("btn-61");
+
+const rangeButtons = [
+  btnRange25,
+  btnRange32,
+  btnRange49,
+  btnRange61,
+];
+
+function setSelectedButton(el, buttons) {
+  for (const btn of buttons) {
+    if (btn === el)  {
+      btn.classList.remove("list-button");
+      btn.classList.add("list-button-selected");
+    } else {
+      btn.classList.remove("list-button-selected");
+      btn.classList.add("list-button");
+    }
+  }
+}
 
 btnModeShowAndPlay.onclick = (el, ev) => {
   if (gMode !== GameMode.ShowAndPlay) {
@@ -259,12 +283,7 @@ btnModeShowAndPlay.onclick = (el, ev) => {
       playNote();
     }
   }
-  btnModeShowAndPlay.classList.remove("list-button");
-  btnModeShowAndPlay.classList.add("list-button-selected");
-  btnModePlayOnly.classList.remove("list-button-selected");
-  btnModePlayOnly.classList.add("list-button");
-  btnModeShowOnly.classList.remove("list-button-selected");
-  btnModeShowOnly.classList.add("list-button");
+  setSelectedButton(btnModeShowAndPlay, modeButtons);
 };
 
 btnModePlayOnly.onclick = (el, ev) => {
@@ -276,12 +295,7 @@ btnModePlayOnly.onclick = (el, ev) => {
       playNote();
     }
   }
-  btnModePlayOnly.classList.remove("list-button");
-  btnModePlayOnly.classList.add("list-button-selected");
-  btnModeShowAndPlay.classList.remove("list-button-selected");
-  btnModeShowAndPlay.classList.add("list-button");
-  btnModeShowOnly.classList.remove("list-button-selected");
-  btnModeShowOnly.classList.add("list-button");
+  setSelectedButton(btnModePlayOnly, modeButtons);
 };
 
 btnModeShowOnly.onclick = (el, ev) => {
@@ -289,12 +303,7 @@ btnModeShowOnly.onclick = (el, ev) => {
     gMode = GameMode.ShowOnly;
     showNotes();
   }
-  btnModeShowOnly.classList.remove("list-button");
-  btnModeShowOnly.classList.add("list-button-selected");
-  btnModeShowAndPlay.classList.remove("list-button-selected");
-  btnModeShowAndPlay.classList.add("list-button");
-  btnModePlayOnly.classList.remove("list-button-selected");
-  btnModePlayOnly.classList.add("list-button");
+  setSelectedButton(btnModeShowOnly, modeButtons);
 };
 
 btnRange25.onclick = (el, ev) => {
@@ -304,14 +313,7 @@ btnRange25.onclick = (el, ev) => {
     chooseNote();
     playNote();
   }
-  btnRange25.classList.remove("list-button");
-  btnRange25.classList.add("list-button-selected");
-  btnRange32.classList.remove("list-button-selected");
-  btnRange32.classList.add("list-button");
-  btnRange49.classList.remove("list-button-selected");
-  btnRange49.classList.add("list-button");
-  btnRange61.classList.remove("list-button-selected");
-  btnRange61.classList.add("list-button");
+  setSelectedButton(btnRange25, rangeButtons);
 };
 
 btnRange32.onclick = (el, ev) => {
@@ -321,14 +323,7 @@ btnRange32.onclick = (el, ev) => {
     chooseNote();
     playNote();
   }
-  btnRange32.classList.remove("list-button");
-  btnRange32.classList.add("list-button-selected");
-  btnRange25.classList.remove("list-button-selected");
-  btnRange25.classList.add("list-button");
-  btnRange49.classList.remove("list-button-selected");
-  btnRange49.classList.add("list-button");
-  btnRange61.classList.remove("list-button-selected");
-  btnRange61.classList.add("list-button");
+  setSelectedButton(btnRange32, rangeButtons);
 };
 
 btnRange49.onclick = (el, ev) => {
@@ -338,14 +333,7 @@ btnRange49.onclick = (el, ev) => {
     chooseNote();
     playNote();
   }
-  btnRange49.classList.remove("list-button");
-  btnRange49.classList.add("list-button-selected");
-  btnRange25.classList.remove("list-button-selected");
-  btnRange25.classList.add("list-button");
-  btnRange32.classList.remove("list-button-selected");
-  btnRange32.classList.add("list-button");
-  btnRange61.classList.remove("list-button-selected");
-  btnRange61.classList.add("list-button");
+  setSelectedButton(btnRange49, rangeButtons);
 };
 
 btnRange61.onclick = (el, ev) => {
@@ -355,14 +343,7 @@ btnRange61.onclick = (el, ev) => {
     chooseNote();
     playNote();
   }
-  btnRange61.classList.remove("list-button");
-  btnRange61.classList.add("list-button-selected");
-  btnRange25.classList.remove("list-button-selected");
-  btnRange25.classList.add("list-button");
-  btnRange32.classList.remove("list-button-selected");
-  btnRange32.classList.add("list-button");
-  btnRange49.classList.remove("list-button-selected");
-  btnRange49.classList.add("list-button");
+  setSelectedButton(btnRange61, rangeButtons);
 };
 
 function showNotes() {
