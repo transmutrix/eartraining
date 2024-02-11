@@ -60,6 +60,18 @@ const buildNoteTable = (start, end) => {
     });
 };
 
+export const renderOnscreenKeyboard = (data) => {
+  let s = `<div class="synth">`
+  // s += `    <h2>${data.length} KEYS</h2>`;
+  s += `    <div id="kb${data.length}" class="kb kb--${data.length}">`;
+  s += data.map(item => `
+    <button aria-label="${item.name}${item.octave}"
+    data-freq="${item.freq}" data-index="${item.index}" style="--gcs:${item.offset}"
+    type="button>"></button>`).join('\n');
+  s += `</div></div>`;
+  return s;
+};
+
 export const noteTable88 = buildNoteTable(-48,40);
 export const noteTable61 = buildNoteTable(-33, 28);
 export const noteTable49 = buildNoteTable(-21, 28);

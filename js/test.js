@@ -1,7 +1,7 @@
 import {
   audioCtx, synthNoteOn, synthNoteOff, synthGameNoteOn, synthGameNoteOff,
   noteTable61, noteTable49, noteTable32, noteTable25,
-  sharpsToFlats
+  sharpsToFlats, renderOnscreenKeyboard
 } from "./synth.js";
 
 import { setLabel, setError, setSelectedButton } from "./util.js";
@@ -65,6 +65,13 @@ const btnRange61 = document.getElementById("btn-61");
 const rangeButtons = [btnRange25, btnRange32, btnRange49, btnRange61];
 const noteTables = [noteTable25, noteTable32, noteTable49, noteTable61];
 
+// Onscreen keyboard set-up
+
+const onscreenKeyboard = document.getElementById("onscreen-keyboard");
+initOnscreenKeyboard();
+
+// MIDI set-up
+
 const midiSupported = navigator.requestMIDIAccess;
 if (!midiSupported)  setError("This browser doesn't support WebMIDI!");
 
@@ -72,6 +79,8 @@ setLabel("message", "Finding MIDI devices...");
 await navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
 
 setLabel("message", "Click 'PLAY NOTE' or press Space ␣ to start.");
+
+// Buttons set-up
 
 btnModeShowAndPlay.onclick = (el, ev) => {
   if (gMode !== GameMode.ShowAndPlay) {
@@ -111,6 +120,7 @@ rangeButtons.forEach((btn, i) => {
       gNoteTable = noteTables[i];
       chooseNote(true);
       playNote();
+      initOnscreenKeyboard();
     }
     setSelectedButton(btn, rangeButtons);
   };
@@ -130,7 +140,11 @@ document.body.onkeydown = function(e){
   }
 }
 
+// Start the game loop!
+
 window.requestAnimationFrame(loop);
+
+// Function definitions.
 
 function loop(timestamp) {
   const dt = timestamp - lastLoop;
@@ -401,4 +415,18 @@ function createFX(message) {
   el.classList.add("perfect");
   gEffectContainer.appendChild(el);
   gEffects.push({ time: Date.now(), lifetime: 2, el: el });
+}
+
+function initOnscreenKeyboard() {
+  onscreenKeyboard.innerHTML = renderOnscreenKeyboard(gNoteTable);
+  const keys = onscreenKeyboard.querySelector("div").children;
+  for (const key of keys) {
+    key.addEventListener('pointerdown', (ev) => {
+      synthNoteOn(parseInt(ev.target.dataset.index), 127*0.5);
+    })
+    key.addEventListener('pointerup', (ev) => synthNoteOff(parseInt(ev.target.dataset.index)))
+    key.addEventListener('pointerleave', (ev) => synthNoteOff(parseInt(ev.target.dataset.index)))
+    key.addEventListener('pointercancel', (ev) => synthNoteOff(parseInt(ev.target.dataset.index)))
+    key.addEventListener('pointerout', (ev) => synthNoteOff(parseInt(ev.target.dataset.index)))
+  }
 }

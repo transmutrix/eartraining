@@ -222,3 +222,63 @@ html {
   transition: 0.2s;
   opacity: 0%;
 }
+
+/* #onscreen-keyboard {} */
+
+/* @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap'); */
+.kb {
+  font-size: 16px;
+  block-size: var(--_bs, 8em);
+  display: grid;
+  grid-column-gap: 1px;
+  grid-template-columns: repeat(var(--_r, 156), 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  inline-size: max-content;
+}
+.kb [aria-label] {
+  --_focus-bxsh: inset 0 0 50px #fff, inset 20px 0 80px hsl(var(--_h,0), 70%, 35%), inset -20px 0 80px hsl(var(--_h,0), 100%, 50%);
+  --_hover-bg: #ffe1f2;
+  background-color: var(--_bgc, white);
+  border: 0;
+  border-radius: 0 0 3px 3px;
+  grid-column: var(--gcs) / span var(--_csp, 3);
+  grid-row: 1 / span var(--_rsp, 5);
+  border-bottom: 8px solid rgb(184, 99, 203);
+  transition-duration: 0.2s;
+}
+.kb [aria-label*="#"], .kb [aria-label*="♯"] {
+  --_bgc: #4a2b69;
+  --_csp: 2;
+  --_focus-bxsh: inset 0 0 50px hsl(var(--_h,0), 25%, 35%), inset 20px 0 80px hsl(var(--_h,0), 70%, 35%), inset -20px 0 80px hsl(var(--_h,0), 100%, 50%);
+  --_hover-bg: hsl(276, 29%, 44%);
+  --_rsp: 3;
+  position: relative;
+  border-bottom: 8px solid rgb(162, 111, 213);
+  transition-duration: 0.2s;
+}
+.kb [aria-label]:hover {
+  background: var(--_hover-bg);
+}
+.kb [aria-label]:active {
+  border-bottom: 0;
+  transition-duration: 0.2s;
+}
+.kb [aria-label]:focus-visible { box-shadow: var(--_focus-bxsh); outline: none; }
+.synth {
+  font-size: 20px;
+  /* font-family: 'Russo One', sans-serif; */
+  background: linear-gradient(215deg, hsl(275, 33%, 25%), hsl(296, 27%, 12%), hsl(292, 78%, 9%));
+  border-radius: .33em .33em .75em .75em;
+  color: #FFF;
+  inline-size: max-content;
+  padding: 1em 1em 1em 1em;
+  margin-bottom: 1rem;
+}
+.synth h2 {
+  font-size: 20px;
+  margin: 0 0 .5em 0;
+}
+.kb--61 { --_r: 108;--_h: 180 }
+.kb--49 { --_r: 87;--_h: 200 }
+.kb--32 { --_bs: 6em; --_r: 57;--_h: 300 }
+.kb--25 { --_bs: 6em; --_r: 45;--_h: 45 }
