@@ -9,7 +9,7 @@ html {
 
 #error {
   color: pink;
-  font-size: 120%;
+  /* font-size: 100%; */
 }
 
 #message {
@@ -267,12 +267,13 @@ html {
 .synth {
   font-size: 20px;
   /* font-family: 'Russo One', sans-serif; */
-  background: linear-gradient(215deg, hsl(275, 33%, 25%), hsl(296, 27%, 12%), hsl(292, 78%, 9%));
+  background: linear-gradient(215deg, hsl(275, 33%, 25%), hsl(296, 27%, 12%), hsl(275, 33%, 25%));
   border-radius: .33em .33em .75em .75em;
   color: #FFF;
   inline-size: max-content;
   padding: 1em 1em 1em 1em;
   margin-bottom: 1rem;
+  box-shadow: 0px 16px 0px hsl(274, 42%, 12%);
 }
 .synth h2 {
   font-size: 20px;

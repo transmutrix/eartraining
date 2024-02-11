@@ -6,7 +6,7 @@ export function setLabel(id, text) {
 
 export function setError(text) {
   setLabel("error", text);
-  throw new Error(text);
+  // throw new Error(text);
 }
 
 export function setSelectedButton(el, buttons) {

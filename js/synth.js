@@ -67,7 +67,7 @@ export const renderOnscreenKeyboard = (data) => {
   s += data.map(item => `
     <button aria-label="${item.name}${item.octave}"
     data-freq="${item.freq}" data-index="${item.index}" style="--gcs:${item.offset}"
-    type="button>"></button>`).join('\n');
+    type="button>" class="kbBtn"></button>`).join('\n');
   s += `</div></div>`;
   return s;
 };

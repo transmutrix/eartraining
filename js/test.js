@@ -3,8 +3,10 @@ import {
   noteTable61, noteTable49, noteTable32, noteTable25,
   sharpsToFlats, renderOnscreenKeyboard
 } from "./synth.js";
-
 import { setLabel, setError, setSelectedButton } from "./util.js";
+// import { gMidiAccess } from "./midi.js";
+
+let gMidiAccess = null;
 
 const gLogging = false;
 const BaseScore = 10;
@@ -21,7 +23,6 @@ const GameMode = Object.freeze({
   ShowOnly: Symbol("ShowOnly"),
 });
 
-let gMidiAccess = null;
 let gMode = GameMode.ShowAndPlay;
 let gNoteTable = noteTable49;
 let gGameState = GameState.Init;
@@ -73,10 +74,12 @@ initOnscreenKeyboard();
 // MIDI set-up
 
 const midiSupported = navigator.requestMIDIAccess;
-if (!midiSupported)  setError("This browser doesn't support WebMIDI!");
-
-setLabel("message", "Finding MIDI devices...");
-await navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+if (midiSupported) {
+  setLabel("message", "Finding MIDI devices...");
+  await navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+} else {
+  setError("This browser doesn't support WebMIDI!<br>Use the on-screen keyboard below.");
+}
 
 setLabel("message", "Click 'PLAY NOTE' or press Space ␣ to start.");
 
@@ -238,12 +241,12 @@ function onMIDISuccess(midiAccess) {
     // }
 
     if (midiAccess.inputs.size === 0) {
-      setError("No MIDI input devices detected!<br>Please connect a MIDI device and refresh the page.");
+      setError("No MIDI input devices detected!<br>Connect one and refresh, or use the on-screen keyboard below.");
     }
 }
 
 function onMIDIFailure() {
-  setError("Could not access MIDI devices!");
+  setError("Could not access MIDI devices!<br>Use the on-screen keyboard below.");
 }
 
 function getMIDIMessage(midiMessage) {
@@ -339,7 +342,7 @@ function onNoteOn(note, velocity) {
           gNote = null;
           gGameState = GameState.Init;
           gQueueNext = Date.now() + 2000;
-          setLabel("possible-points", "");
+          setLabel("possible-points", "Possible points: -");
         } else {
           if (gNote.name === gGuessed.name) {
             gPoints = Math.max(MinScore, gPoints - 1);
@@ -419,14 +422,31 @@ function createFX(message) {
 
 function initOnscreenKeyboard() {
   onscreenKeyboard.innerHTML = renderOnscreenKeyboard(gNoteTable);
-  const keys = onscreenKeyboard.querySelector("div").children;
+  const synth = onscreenKeyboard.querySelector("div").children[0];
+  const keys = synth.children;
   for (const key of keys) {
+    if (!key.classList.contains("kbBtn"))  continue;
     key.addEventListener('pointerdown', (ev) => {
-      synthNoteOn(parseInt(ev.target.dataset.index), 127*0.5);
+      onNoteOn(parseInt(ev.target.dataset.index), 127*0.5);
+      // const chromePointerEvents = typeof PointerEvent === 'function';
+      // if (chromePointerEvents && ev.pointerId === undefined) {
+      //   return;
+      // }
+      // ev.target.releasePointerCapture(ev.pointerID);
     })
-    key.addEventListener('pointerup', (ev) => synthNoteOff(parseInt(ev.target.dataset.index)))
-    key.addEventListener('pointerleave', (ev) => synthNoteOff(parseInt(ev.target.dataset.index)))
-    key.addEventListener('pointercancel', (ev) => synthNoteOff(parseInt(ev.target.dataset.index)))
-    key.addEventListener('pointerout', (ev) => synthNoteOff(parseInt(ev.target.dataset.index)))
+    // FIXME: I can't make this work quite right, so meh.
+    key.addEventListener('pointerenter', (ev) => {
+      // console.log(ev);
+      if (ev.isPrimary & ev.buttons) {
+        onNoteOn(parseInt(ev.target.dataset.index), 127*0.5);
+        // FIXME: This doesn't work, and not sure how to make it work...
+        ev.target.focus();
+        ev.target.click();
+      }
+    })
+    key.addEventListener('pointerup', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
+    key.addEventListener('pointerleave', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
+    key.addEventListener('pointercancel', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
+    key.addEventListener('pointerout', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
   }
 }
