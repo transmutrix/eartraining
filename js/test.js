@@ -4,6 +4,12 @@ import {
   sharpsToFlats
 } from "./synth.js";
 
+import {
+  setLabel,
+  setError,
+  setSelectedButton,
+} from "./util.js";
+
 const gLogging = false;
 const BaseScore = 10;
 const MinScore = 1;
@@ -31,46 +37,12 @@ let gMaxScore = 0;
 let gPerfects = 0;
 let gQueueNext = 0;
 
-function setLabel(id, text) {
-  const el = document.getElementById(id);
-  if (el)  el.innerHTML = text;
-}
-
-function setError(text) {
-  setLabel("error", text);
-  throw new Error(text);
-}
-
 const gEffectContainer = document.getElementById("fx");
 const gEffects = [];
 
-function createFXPerfect() {
+function createFX(message) {
   const el = document.createElement("div");
-  el.innerText = "✨ PERFECT! ✨";
-  el.classList.add("perfect");
-  gEffectContainer.appendChild(el);
-  gEffects.push({ time: Date.now(), lifetime: 2, el: el });
-}
-
-function createFXNice() {
-  const el = document.createElement("div");
-  el.innerText = "Nice! 👍";
-  el.classList.add("perfect");
-  gEffectContainer.appendChild(el);
-  gEffects.push({ time: Date.now(), lifetime: 2, el: el });
-}
-
-function createFXOk() {
-  const el = document.createElement("div");
-  el.innerText = "Ok! 😅";
-  el.classList.add("perfect");
-  gEffectContainer.appendChild(el);
-  gEffects.push({ time: Date.now(), lifetime: 2, el: el });
-}
-
-function createFXBogey() {
-  const el = document.createElement("div");
-  el.innerText = "😬😬😬";
+  el.innerText = message;
   el.classList.add("perfect");
   gEffectContainer.appendChild(el);
   gEffects.push({ time: Date.now(), lifetime: 2, el: el });
@@ -103,13 +75,13 @@ function onNoteOn(note, velocity) {
           gScore += gPoints;
           if (gPoints === BaseScore) {
             gPerfects += 1;
-            createFXPerfect();
+            createFX("✨ PERFECT! ✨");
           } else if (gPoints >= Math.floor(BaseScore * 0.75)) {
-            createFXNice();
+            createFX("Nice! 👍");
           } else if (gPoints >= Math.floor(BaseScore * 0.45)) {
-            createFXOk();
+            createFX("Ok! 😅");
           } else {
-            createFXBogey();
+            createFX("😬😬😬");
           }
           gNote = null;
           gGameState = GameState.Init;
@@ -223,13 +195,13 @@ function onMIDIFailure() {
 setLabel("message", "Finding MIDI devices...");
 await navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
 
+setLabel("message", "Click 'PLAY NOTE' or press Space ␣ to start.");
+
 let gNoteIndex = 0;
 let gNote = null;
 let gNoteStarted = 0;
 let gGuessed = null;
 let gGameStartTime = 0;
-
-setLabel("message", "Click 'PLAY NOTE' or press Space ␣ to start.");
 
 const btnPlay = document.getElementById("btn-play");
 const note1Display = document.getElementById("note1");
@@ -243,36 +215,13 @@ const gamePerfects = document.getElementById("game-perfects");
 const btnModeShowAndPlay = document.getElementById("btn-mode1");
 const btnModePlayOnly = document.getElementById("btn-mode2");
 const btnModeShowOnly = document.getElementById("btn-mode3");
-
-const modeButtons = [
-  btnModeShowAndPlay,
-  btnModePlayOnly,
-  btnModeShowOnly,
-];
+const modeButtons = [btnModeShowAndPlay, btnModePlayOnly, btnModeShowOnly];
 
 const btnRange25 = document.getElementById("btn-25");
 const btnRange32 = document.getElementById("btn-32");
 const btnRange49 = document.getElementById("btn-49");
 const btnRange61 = document.getElementById("btn-61");
-
-const rangeButtons = [
-  btnRange25,
-  btnRange32,
-  btnRange49,
-  btnRange61,
-];
-
-function setSelectedButton(el, buttons) {
-  for (const btn of buttons) {
-    if (btn === el)  {
-      btn.classList.remove("list-button");
-      btn.classList.add("list-button-selected");
-    } else {
-      btn.classList.remove("list-button-selected");
-      btn.classList.add("list-button");
-    }
-  }
-}
+const rangeButtons = [btnRange25, btnRange32, btnRange49, btnRange61];
 
 btnModeShowAndPlay.onclick = (el, ev) => {
   if (gMode !== GameMode.ShowAndPlay) {
