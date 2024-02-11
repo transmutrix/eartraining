@@ -109,7 +109,7 @@ rangeButtons.forEach((btn, i) => {
   btn.onclick = (el, ev) => {
     if (gNoteTable !== noteTables[i]) {
       gNoteTable = noteTables[i];
-      chooseNote();
+      chooseNote(true);
       playNote();
     }
     setSelectedButton(btn, rangeButtons);
@@ -363,7 +363,7 @@ function showNotes() {
   }
 }
 
-function chooseNote() {
+function chooseNote(skipScore = false) {
   if (gNote)  {
     synthGameNoteOff(gNote.index);
     note1Speaker.style.opacity = "0%";
@@ -373,9 +373,10 @@ function chooseNote() {
   gNote = gNoteTable[gNoteIndex];
   // if (gLogging)  console.log(gNoteIndex, gNote);
 
-  gGameState = GameState.Playing;
-  gMaxScore += BaseScore;
+  if (!skipScore)  gMaxScore += BaseScore;
+
   gPoints = BaseScore;
+  gGameState = GameState.Playing;
 
   showNotes();
 
