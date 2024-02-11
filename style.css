@@ -92,6 +92,7 @@ html {
 }
 
 .note-display {
+  position: relative;
   width: 8rem;
   height: 8rem;
   margin: auto;
@@ -211,4 +212,13 @@ html {
 #possible-points {
   font-size: 80%;
   margin-left: 0.5em;
+}
+
+.note-speaker {
+  font-size: 40px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  transition: 0.2s;
+  opacity: 0%;
 }

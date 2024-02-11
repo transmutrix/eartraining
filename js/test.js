@@ -85,6 +85,7 @@ function onNoteOn(note, velocity) {
   // setLabel("message", "Note on: " + note);
   // queueNoteOn(note, velocity);
   synthNoteOn(note, velocity);
+  note2Speaker.style.opacity = "100%";
   switch (gGameState) {
     case GameState.PlayNote:
     case GameState.Guessed:
@@ -131,6 +132,7 @@ function onNoteOff(note) {
   // setLabel("message", "Note off: " + note);
   // queueNoteOff(note);
   synthNoteOff(note);
+  note2Speaker.style.opacity = "0%";
 }
 
 function getMIDIMessage(midiMessage) {
@@ -295,6 +297,8 @@ setLabel("message", "Click 'PLAY NOTE' or press Space ␣ to start.");
 const btnPlay = document.getElementById("btn-play");
 const note1Display = document.getElementById("note1");
 const note2Display = document.getElementById("note2");
+const note1Speaker = document.getElementById("note1-speaker");
+const note2Speaker = document.getElementById("note2-speaker");
 const gameClock = document.getElementById("game-clock");
 const gameScore = document.getElementById("game-score");
 const gamePerfects = document.getElementById("game-perfects");
@@ -441,7 +445,10 @@ function showNotes() {
 }
 
 function chooseNote() {
-  if (gNote)  synthGameNoteOff(gNote.index);
+  if (gNote)  {
+    synthGameNoteOff(gNote.index);
+    note1Speaker.style.opacity = "0%";
+  }
 
   gNoteIndex = Math.floor(Math.random() * gNoteTable.length);
   gNote = gNoteTable[gNoteIndex];
@@ -466,6 +473,7 @@ function playNote() {
   gNoteStarted = performance.now();
   synthGameNoteOn(gNote.index, 127*0.75);
   gPlayingNotes.push({ index: gNote.index, time: Date.now() });
+  note1Speaker.style.opacity = "100%";
   // btnPlay.classList.add("progress");
 }
 
@@ -496,6 +504,7 @@ function updateGame(dt) {
       if (gNoteStarted && now - gNoteStarted >= 1000.0) {
         gNoteStarted = 0;
         synthGameNoteOff(gNote.index);
+        note1Speaker.style.opacity = "0%";
         // btnPlay.classList.remove("progress");
       }
     } break;
@@ -507,6 +516,7 @@ function updateGame(dt) {
   for (let i = gPlayingNotes.length-1; i >= 0; --i) {
     if (date >= gPlayingNotes[i].time + 2000) {
       synthGameNoteOff(gPlayingNotes[i].index);
+      note1Speaker.style.opacity = "0%";
       gPlayingNotes.splice(i);
     }
   }
