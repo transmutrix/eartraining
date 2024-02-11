@@ -1,4 +1,8 @@
-import { audioCtx, synthNoteOn, synthNoteOff, noteTable } from "./synth.js";
+import {
+  audioCtx, synthNoteOn, synthNoteOff,
+  noteTable61, noteTable49, noteTable32, noteTable25,
+  sharpsToFlats
+} from "./synth.js";
 
 const gLogging = false;
 const BaseScore = 10;
@@ -10,23 +14,22 @@ const GameState = Object.freeze({
   Guessed: Symbol("Guessed"),
 });
 
+const GameMode = Object.freeze({
+  ShowAndPlay: Symbol("ShowAndPlay"),
+  PlayOnly: Symbol("PlayOnly"),
+  ShowOnly: Symbol("ShowOnly"),
+});
+
 let gMidiAccess = null;
+let gMode = GameMode.ShowAndPlay;
+let gRange = 49;
+let gNoteTable = noteTable49;
 let gGameState = GameState.Init;
 let gScore = 0;
 let gPoints = 0;
 let gMaxScore = 0;
 let gPerfects = 0;
-// let gGuesses = 0;
-// let gUsedHint = false;
-// let gCommands = [];
-
-let gLowestNoteIndex = 27; // 0
-let gHighestNoteIndex = 75; // noteTable.length - 1;
-
 let gQueueNext = 0;
-
-// const queueNoteOn = (note, velocity) => gCommands.push({kind: 'note-on', note: note, velocity: velocity});
-// const queueNoteOff = (note) => gCommands.push({kind: 'note-off', note: note, velocity: 0});
 
 function setLabel(id, text) {
   const el = document.getElementById(id);
@@ -87,7 +90,7 @@ function onNoteOn(note, velocity) {
     case GameState.Guessed:
     {
       gGuessed = null;
-      for (const check of noteTable) {
+      for (const check of gNoteTable) {
         if (check.index === note) {
           gGuessed = check;
           break;
@@ -95,7 +98,6 @@ function onNoteOn(note, velocity) {
       }
       if (gGuessed) {
         note2Display.textContent = `${gGuessed.name}${gGuessed.octave}`;
-        // TODO: Check correctness!
         if (gNote === gGuessed) {
           gScore += gPoints;
           if (gPoints === BaseScore) {
@@ -297,24 +299,162 @@ const gameClock = document.getElementById("game-clock");
 const gameScore = document.getElementById("game-score");
 const gamePerfects = document.getElementById("game-perfects");
 
+const btnModeShowAndPlay = document.getElementById("btn-mode1");
+const btnModePlayOnly = document.getElementById("btn-mode2");
+const btnModeShowOnly = document.getElementById("btn-mode3");
+
+const btnRange25 = document.getElementById("btn-25");
+const btnRange32 = document.getElementById("btn-32");
+const btnRange49 = document.getElementById("btn-49");
+const btnRange61 = document.getElementById("btn-61");
+
+btnModeShowAndPlay.onclick = (el, ev) => {
+  if (gMode !== GameMode.ShowAndPlay) {
+    const oldMode = gMode;
+    gMode = GameMode.ShowAndPlay;
+    showNotes();
+    if (oldMode === GameMode.ShowOnly) {
+      playNote();
+    }
+  }
+  btnModeShowAndPlay.classList.remove("list-button");
+  btnModeShowAndPlay.classList.add("list-button-selected");
+  btnModePlayOnly.classList.remove("list-button-selected");
+  btnModePlayOnly.classList.add("list-button");
+  btnModeShowOnly.classList.remove("list-button-selected");
+  btnModeShowOnly.classList.add("list-button");
+};
+
+btnModePlayOnly.onclick = (el, ev) => {
+  if (gMode !== GameMode.PlayOnly) {
+    const oldMode = gMode;
+    gMode = GameMode.PlayOnly;
+    showNotes();
+    if (oldMode === GameMode.ShowOnly) {
+      playNote();
+    }
+  }
+  btnModePlayOnly.classList.remove("list-button");
+  btnModePlayOnly.classList.add("list-button-selected");
+  btnModeShowAndPlay.classList.remove("list-button-selected");
+  btnModeShowAndPlay.classList.add("list-button");
+  btnModeShowOnly.classList.remove("list-button-selected");
+  btnModeShowOnly.classList.add("list-button");
+};
+
+btnModeShowOnly.onclick = (el, ev) => {
+  if (gMode !== GameMode.ShowOnly) {
+    gMode = GameMode.ShowOnly;
+    showNotes();
+  }
+  btnModeShowOnly.classList.remove("list-button");
+  btnModeShowOnly.classList.add("list-button-selected");
+  btnModeShowAndPlay.classList.remove("list-button-selected");
+  btnModeShowAndPlay.classList.add("list-button");
+  btnModePlayOnly.classList.remove("list-button-selected");
+  btnModePlayOnly.classList.add("list-button");
+};
+
+btnRange25.onclick = (el, ev) => {
+  if (gRange !== 25) {
+    gRange = 25;
+    gNoteTable = noteTable25;
+    // TODO: choose new note!
+  }
+  btnRange25.classList.remove("list-button");
+  btnRange25.classList.add("list-button-selected");
+  btnRange32.classList.remove("list-button-selected");
+  btnRange32.classList.add("list-button");
+  btnRange49.classList.remove("list-button-selected");
+  btnRange49.classList.add("list-button");
+  btnRange61.classList.remove("list-button-selected");
+  btnRange61.classList.add("list-button");
+};
+
+btnRange32.onclick = (el, ev) => {
+  if (gRange !== 32) {
+    gRange = 32;
+    gNoteTable = noteTable32;
+    // TODO: choose new note!
+  }
+  btnRange32.classList.remove("list-button");
+  btnRange32.classList.add("list-button-selected");
+  btnRange25.classList.remove("list-button-selected");
+  btnRange25.classList.add("list-button");
+  btnRange49.classList.remove("list-button-selected");
+  btnRange49.classList.add("list-button");
+  btnRange61.classList.remove("list-button-selected");
+  btnRange61.classList.add("list-button");
+};
+
+btnRange49.onclick = (el, ev) => {
+  if (gRange !== 49) {
+    gRange = 49;
+    gNoteTable = noteTable49;
+    // TODO: choose new note!
+  }
+  btnRange49.classList.remove("list-button");
+  btnRange49.classList.add("list-button-selected");
+  btnRange25.classList.remove("list-button-selected");
+  btnRange25.classList.add("list-button");
+  btnRange32.classList.remove("list-button-selected");
+  btnRange32.classList.add("list-button");
+  btnRange61.classList.remove("list-button-selected");
+  btnRange61.classList.add("list-button");
+};
+
+btnRange61.onclick = (el, ev) => {
+  if (gRange !== 61) {
+    gRange = 61;
+    gNoteTable = noteTable61;
+    // TODO: choose new note!
+  }
+  btnRange61.classList.remove("list-button");
+  btnRange61.classList.add("list-button-selected");
+  btnRange25.classList.remove("list-button-selected");
+  btnRange25.classList.add("list-button");
+  btnRange32.classList.remove("list-button-selected");
+  btnRange32.classList.add("list-button");
+  btnRange49.classList.remove("list-button-selected");
+  btnRange49.classList.add("list-button");
+};
+
+function showNotes() {
+  if (!gNote) {
+    return;
+  }
+  if (gMode === GameMode.ShowAndPlay || gMode === GameMode.ShowOnly) {
+    let name = gNote.name;
+    if (name.includes("♯") && Math.random() >= 0.5) {
+      name = sharpsToFlats[name];
+    }
+    note1Display.textContent = `${name}${gNote.octave}`;
+    note2Display.textContent = "?";
+  } else {
+    note1Display.textContent = "🤷‍♀️";
+    note2Display.textContent = "?";
+  }
+}
+
 function chooseNote() {
-  const range = gHighestNoteIndex - gLowestNoteIndex;
-  gNoteIndex = gLowestNoteIndex + Math.floor(Math.random() * range);
-  gNote = noteTable[gNoteIndex];
+  gNoteIndex = Math.floor(Math.random() * gNoteTable.length);
+  gNote = gNoteTable[gNoteIndex];
   // if (gLogging)  console.log(gNoteIndex, gNote);
 
   gGameState = GameState.PlayNote;
   gMaxScore += BaseScore;
   gPoints = BaseScore;
-  // gGuesses = 0;
 
-  note1Display.textContent = `${gNote.name}${gNote.octave}`;
-  note2Display.textContent = "?";
+  showNotes();
+
   setLabel("message", "Replicate the note!<br>Click the button or press Space ␣ to play it again.");
   setLabel("possible-points", `Possible points: ${gPoints.toFixed(0)}`);
 }
 
 function playNote() {
+  if (!gNote || gMode === GameMode.ShowOnly) {
+    return;
+  }
   gNoteStarted = performance.now();
   synthNoteOn(gNote.index, 127*0.75);
   // btnPlay.classList.add("progress");

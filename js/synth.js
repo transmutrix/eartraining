@@ -19,14 +19,14 @@ function createOscillator(freq, gain) {
 const getHz = (N = 0) => 440 * Math.pow(2, N / 12);
 
 const notes = ['A','A♯','B','C','C♯','D','D♯','E','F','F♯','G','G♯'];
-const sharpsToFlats = Object.freeze({
+export const sharpsToFlats = Object.freeze({
   'A♯': 'B♭',
   'C♯': 'D♭',
   'D♯': 'E♭',
   'F♯': 'G♭',
   'G♯': 'A♭',
 });
-const flatsToSharps = Object.freeze({
+export const flatsToSharps = Object.freeze({
   'B♭': 'A♯',
   'D♭': 'C♯',
   'E♭': 'D♯',
@@ -35,7 +35,7 @@ const flatsToSharps = Object.freeze({
 });
 
 // The start and end parameters are integers defining the number of notes to the left (start) and right (end) of A440. On a grand piano, which has 88 keys, this is the same as freqs(-48, 40)
-export const noteTable = ((start, end) => {
+const buildNoteTable = (start, end) => {
   let black = 0;
   let white = -2;
   return Array(end - start)
@@ -57,7 +57,13 @@ export const noteTable = ((start, end) => {
         offset: note.includes("♯") ? black : white,
       };
     });
-})(-48,40);
+};
+
+export const noteTable88 = buildNoteTable(-48,40);
+export const noteTable61 = buildNoteTable(-33, 28);
+export const noteTable49 = buildNoteTable(-21, 28);
+export const noteTable32 = buildNoteTable(-9, 23);
+export const noteTable25 = buildNoteTable(-9, 16);
 
 export function synthNoteOn(note, velocity = 127) {
   // A4 (440) is our base, and zero in our getHz.
