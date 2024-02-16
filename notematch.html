@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link href="style.css" rel="stylesheet" />
+</head>
+<body>
+
+  <div id="game-name" class="tshadow">Note Match</div>
+
+  <div id="message" class="tshadow"></div>
+  <div id="error" class="tshadow"></div>
+  <!-- <div id="fps-display" class="tshadow"></div> -->
+
+  <div id="game-stats" class="tshadow">
+    <div id="game-clock">00:00</div>
+    <div id="game-score">0/0</div>
+    <div id="game-perfects"></div>
+  </div>
+
+  <div id="note-container">
+    <!-- <div class="center"> -->
+      <div class="note-display">
+        <div id="note1" class="note-display-name"></div>
+        <div id="note1-speaker" class="note-speaker">🔈</div>
+      </div>
+      <div class="note-display">
+        <div id="note2" class="note-display-name"></div>
+        <div id="note2-speaker" class="note-speaker">🔈</div>
+      </div>
+    <!-- </div> -->
+  </div>
+
+  <div>
+    <div id="possible-points" class="tshadow"></div>
+    <br>
+    <!-- <div class="center"> -->
+      <div id="btn-play" class="button">PLAY NOTE</div>
+    <!-- </div> -->
+  </div>
+  <br>
+
+  <!-- Cribbed design from https://blog.logrocket.com/exploring-web-audio-api-web-midi-api/ -->
+  <div id="onscreen-keyboard">
+  </div>
+
+  <div id="config">
+    <div class="button-list">
+      <div class="button-list-label">Mode: </div>
+      <div id="btn-mode1" class="list-button-selected">Show+Play</div>
+      <div id="btn-mode2" class="list-button">Play Only</div>
+      <div id="btn-mode3" class="list-button">Show Only</div>
+    </div>
+    <div class="button-list-spacer"></div>
+    <div class="button-list">
+      <div class="button-list-label">Range: </div>
+      <div id="btn-25" class="list-button">25 Keys</div>
+      <div id="btn-32" class="list-button">32 Keys</div>
+      <div id="btn-49" class="list-button-selected">49 Keys</div>
+      <div id="btn-61" class="list-button">61 Keys</div>
+    </div>
+  </div>
+
+  <div id="fx">
+    <!-- <div class="perfect">PERFECT!</div> -->
+  </div>
+
+  <script type="module" src="js/notematch.js"></script>
+  <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> -->
+  <!-- <script>
+  </script> -->
+</body>
+</html>

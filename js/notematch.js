@@ -2,8 +2,8 @@ import {
   audioCtx, synthNoteOn, synthNoteOff, synthGameNoteOn, synthGameNoteOff,
   noteTable61, noteTable49, noteTable32, noteTable25,
   sharpsToFlats, renderOnscreenKeyboard
-} from "./synth.js";
-import { setLabel, setError, setSelectedButton } from "./util.js";
+} from "./lib/synth.js";
+import { setLabel, setError, setSelectedButton } from "./lib/util.js";
 // import { gMidiAccess } from "./midi.js";
 
 let gMidiAccess = null;

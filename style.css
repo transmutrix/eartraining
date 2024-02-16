@@ -223,7 +223,28 @@ html {
   opacity: 0%;
 }
 
-/* #onscreen-keyboard {} */
+.pitch-speaker {
+  position: relative;
+  width: 6rem;
+  height: 6rem;
+  line-height: 6rem;
+  margin: auto;
+  display: inline-block;
+  font-size: 400%;
+  /* border: 0.08em solid rgb(224, 192, 255); */
+  text-align: center;
+  border-radius: 0.5rem;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+  transition-duration: 0.2s;
+  cursor: pointer;
+}
+.pitch-speaker:hover {
+  rotate: -5deg;
+  scale: 120%;
+  text-shadow: 0.0625em 0.125em 0.125em #1b1b4c;
+}
 
 /* @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap'); */
 .kb {
@@ -283,3 +304,26 @@ html {
 .kb--49 { --_r: 87;--_h: 200 }
 .kb--32 { --_bs: 6em; --_r: 57;--_h: 300 }
 .kb--25 { --_bs: 6em; --_r: 45;--_h: 45 }
+
+h1 {
+  font-weight: normal;
+  font-size: 120%;
+  /* text-decoration: underline; */
+}
+
+a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: inline-block;
+  transition-duration: 0.2s;
+}
+a:hover {
+  rotate: -5deg;
+  scale: 120%;
+}
+
+#note-buttons .list-button {
+  padding-left: 20px;
+  padding-right: 20px;
+}
