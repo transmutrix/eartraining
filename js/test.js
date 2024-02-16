@@ -426,7 +426,7 @@ function initOnscreenKeyboard() {
   const keys = synth.children;
   for (const key of keys) {
     if (!key.classList.contains("kbBtn"))  continue;
-    key.addEventListener('pointerdown', (ev) => {
+    key.addEventListener('mousedown', (ev) => {
       onNoteOn(parseInt(ev.target.dataset.index), 127*0.5);
       // const chromePointerEvents = typeof PointerEvent === 'function';
       // if (chromePointerEvents && ev.pointerId === undefined) {
@@ -435,18 +435,18 @@ function initOnscreenKeyboard() {
       // ev.target.releasePointerCapture(ev.pointerID);
     })
     // FIXME: I can't make this work quite right, so meh.
-    key.addEventListener('pointerenter', (ev) => {
-      // console.log(ev);
-      if (ev.isPrimary & ev.buttons) {
-        onNoteOn(parseInt(ev.target.dataset.index), 127*0.5);
-        // FIXME: This doesn't work, and not sure how to make it work...
-        ev.target.focus();
-        ev.target.click();
-      }
-    })
-    key.addEventListener('pointerup', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
-    key.addEventListener('pointerleave', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
-    key.addEventListener('pointercancel', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
-    key.addEventListener('pointerout', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
+    // key.addEventListener('mouseenter', (ev) => {
+    //   // console.log(ev);
+    //   if (ev.buttons) {
+    //     onNoteOn(parseInt(ev.target.dataset.index), 127*0.5);
+    //     // FIXME: This doesn't work, and not sure how to make it work...
+    //     ev.target.focus();
+    //     ev.target.click();
+    //   }
+    // })
+    key.addEventListener('mouseleave', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
+    key.addEventListener('mouseup', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
+    // key.addEventListener('pointercancel', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
+    // key.addEventListener('mouseout', (ev) => onNoteOff(parseInt(ev.target.dataset.index)))
   }
 }
